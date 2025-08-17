@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -21,8 +23,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run lint
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: pnpm -s exec eslint .
       - name: Run typecheck
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: pnpm -s exec tsc --noEmit
       - name: Run tests
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: pnpm -s exec vitest run

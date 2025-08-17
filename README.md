@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Sentry (optional)
+
+To enable Sentry for runtime validation/error reporting:
+
+- Locally: copy `.env.example` to `.env` and set `SENTRY_DSN`.
+- In GitHub Actions: add a repository `SENTRY_DSN` secret (Settings → Secrets → Actions) with your DSN.
+
+The CI workflow will expose `SENTRY_DSN` to the job, and the app will send validation errors to Sentry when the DSN is present.

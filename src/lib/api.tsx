@@ -4,6 +4,7 @@ import { API_URL } from '@/constants';
 import type { ApiResponse, Post, Category } from '@/types';
 import { PostListResponseSchema, CategoryListResponseSchema } from './schemas';
 import { z } from 'zod';
+import { logValidationError } from './validationLogger';
 
 type FetchPostsParams = {
   limit?: number;
@@ -34,8 +35,15 @@ export const fetchPosts = async (
     }
 
   const raw = await response.json();
-  const parsed = PostListResponseSchema.parse(raw);
-  return parsed as ApiResponse<Post>;
+  try {
+    const parsed = PostListResponseSchema.parse(raw);
+    return parsed as ApiResponse<Post>;
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      logValidationError('fetchPosts', e);
+    }
+    throw e;
+  }
   } catch (error) {
     console.error('Failed to fetch posts:', error);
     return {
@@ -58,10 +66,11 @@ export const fetchCategoryBySlug = async (slug: string): Promise<ApiResponse<Cat
   if (!response.ok) throw new Error(`Failed to fetch category: ${response.statusText}`);
   const raw = await response.json();
   try {
-  const parsed = CategoryListResponseSchema.parse(raw);
-  return parsed as ApiResponse<Category>;
+    const parsed = CategoryListResponseSchema.parse(raw);
+    return parsed as ApiResponse<Category>;
   } catch (e) {
     if (e instanceof z.ZodError) {
+      logValidationError('fetchCategoryBySlug', e);
       throw new Error(`Category response validation failed: ${e.message}`);
     }
     throw e;
@@ -73,8 +82,13 @@ export const fetchPagesByCategory = async (categoryId: string) => {
   const response = await fetch(url, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to fetch pages for category: ${response.statusText}`);
   const raw = await response.json();
-  const parsed = PostListResponseSchema.parse(raw);
-  return parsed as ApiResponse<Post>;
+  try {
+    const parsed = PostListResponseSchema.parse(raw);
+    return parsed as ApiResponse<Post>;
+  } catch (e) {
+    if (e instanceof z.ZodError) logValidationError('fetchPagesByCategory', e);
+    throw e;
+  }
 };
 
 export const fetchPageBySlug = async (slug: string) => {
@@ -82,8 +96,13 @@ export const fetchPageBySlug = async (slug: string) => {
   const response = await fetch(url, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to fetch page by slug: ${response.statusText}`);
   const raw = await response.json();
-  const parsed = PostListResponseSchema.parse(raw);
-  return parsed as ApiResponse<Post>;
+  try {
+    const parsed = PostListResponseSchema.parse(raw);
+    return parsed as ApiResponse<Post>;
+  } catch (e) {
+    if (e instanceof z.ZodError) logValidationError('fetchPageBySlug', e);
+    throw e;
+  }
 };
 
 // Safe wrappers that return data or error instead of throwing.
