@@ -35,7 +35,7 @@ jobs:
       - name: Run lint
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: pnpm -s exec eslint .
+        run: pnpm -s exec eslint src tests --ext .ts,.tsx
       - name: Run typecheck
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PostListResponseSchema, PostSchema, CategorySchema, MediaSchema } from '../src/lib/schemas';
+import { PostListResponseSchema, CategorySchema, MediaSchema } from '../src/lib/schemas';
 
 describe('zod schemas', () => {
   it('coerces numeric ids to strings and normalizes name/alt', () => {

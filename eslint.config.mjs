@@ -10,6 +10,8 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // ignore generated and third-party files (flat config uses `ignores`)
+  { ignores: ["node_modules", ".next", "dist", "coverage"] },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 
