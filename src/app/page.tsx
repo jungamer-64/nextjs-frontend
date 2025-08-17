@@ -1,103 +1,56 @@
-import Image from "next/image";
+// src/app/page.tsx
 
-export default function Home() {
+import { fetchPosts } from '@/lib/api';
+import Hero from '@/components/Hero';
+import PostCard from '@/components/PostCard';
+import Pagination from '@/components/Pagination';
+// Post type imported from shared types when needed in components
+
+const POSTS_PER_PAGE = 3;
+
+type HomeProps = {
+  // Keep this as a Promise to satisfy Next's PageProps constraint. Next may pass a Promise or a plain object at runtime; `await` handles both.
+  searchParams?: Promise<Record<string, string | undefined>> | undefined;
+};
+
+export default async function Home(props: HomeProps) {
+  const { searchParams } = props;
+  // Resolve searchParams which may be a Promise in some Next runtimes (or a plain object at runtime)
+  const resolved = (await searchParams) as Record<string, string | undefined> | undefined;
+  const { page } = resolved ?? {};
+  const currentPage = Number(page) || 1;
+
+  const { docs: posts, ...paginationInfo } = await fetchPosts({
+    limit: POSTS_PER_PAGE,
+    page: currentPage,
+  });
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <main className="bg-gradient-to-b from-background via-background/95 to-background min-h-screen">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <Hero
+          title="適当に作ったブログです。"
+          subtitle="とりあえずテストで作ってみました。"
+          imageUrl="/globe.svg" // この画像は適宜変更してください
         />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <section className="mt-12">
+          <div className="flex items-end justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+              最新記事
+            </h2>
+            <span className="text-sm text-foreground/60">全{paginationInfo.totalDocs ?? posts.length}件</span>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post, idx: number) => (
+              <PostCard key={post.id} post={post} priority={idx < 2} />
+            ))}
+          </div>
+        </section>
+
+        <Pagination basePath="/" {...paginationInfo} />
+      </div>
+    </main>
   );
 }

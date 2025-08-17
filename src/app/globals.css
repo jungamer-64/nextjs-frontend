@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #fff;
+  --color-foreground: #111827;
+  --color-foreground-60: rgba(17,24,39,0.72);
+  --color-foreground-50: rgba(17,24,39,0.6);
+  --color-card-background: #fff;
+  --color-card-border: #d1d5db; /* slightly darker for better border contrast */
+  --link-color: #2563eb; /* blue-600 */
+  --font-sans: "Noto Sans JP", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background: #111827;
+    --color-foreground: #f9fafb;
+  --color-foreground-60: rgba(249,250,251,0.72);
+  --color-foreground-50: rgba(249,250,251,0.6);
+    --color-card-background: #1f2937;
+    --color-card-border: #374151;
+  --link-color: #60a5fa; /* lighter blue for dark bg */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Stronger link tokens for better contrast */
+:root {
+  --link-foreground: #1e40af; /* darker blue (blue-800) for higher contrast on light bg */
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --link-foreground: #93c5fd; /* lighter but still distinguishable on dark bg */
+  }
+}
+
+/* class-based dark mode support */
+.dark {
+  --color-background: #111827;
+  --color-foreground: #f9fafb;
+  --color-card-background: #1f2937;
+  --color-card-border: #374151;
+}
+
+/* small prose link override */
+.prose a { color: var(--link-color); }
+
+/* utility for text link color with improved contrast */
+.text-link { color: var(--link-foreground); }
+.hover\:text-link:hover { color: var(--link-foreground); }
+
+/* Focus styles for keyboard users */
+*:focus-visible {
+  outline: 3px solid rgba(30,64,175,0.45); /* use a darker blue ring derived from link token */
+  outline-offset: 2px;
+}
+
+/* Smooth theme transitions to avoid flicker when toggling dark mode */
+html, body, .bg-background, .bg-card-background, .text-foreground, .text-link, .border-card-border, .prose a {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+/* Map utility-like classes to CSS variables so class-based dark mode works */
+.bg-background { background-color: var(--color-background); }
+.text-foreground { color: var(--color-foreground); }
+.bg-card-background { background-color: var(--color-card-background); }
+.border-card-border { border-color: var(--color-card-border); }
+.text-foreground\/60 { color: var(--color-foreground-60); }
+.text-foreground\/50 { color: var(--color-foreground-50); }
+.hover\:bg-card-background\/50:hover { background-color: color-mix(in srgb, var(--color-card-background) 50%, transparent); }
+.hover\:bg-card-background\/80:hover { background-color: color-mix(in srgb, var(--color-card-background) 80%, transparent); }
